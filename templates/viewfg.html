@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<style>
+.fixedtable{
+    overflow-y: auto; height: 680px;
+}
+
+.fixedtable thead th{
+position: sticky; top: 0;
+}
+
+th     { background:#eee; }
+
+.part input[type=submit] {
+    padding:2px 2px;
+    background:#ccc;
+    border:0 none;
+    cursor:pointer;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+
+</style>
+<body>
+    <div class = "container-fluid">
+
+        <h1> Detailed FG List View</h1>
+
+        <button class = "btn btn-outline-secondary" onclick="window.location.href = '/listview/'"> Reload </button>
+        <button class = "btn btn-outline-secondary" onclick="window.location.href = '/home/'"> Home </button>
+        <button class = "btn btn-outline-secondary" onclick="window.location.href = '/kam_sum/'"> KAM Wise Summary </button>
+        <button class = "btn btn-outline-secondary" onclick="window.location.href = '/cus_sum/'"> Customer Wise Summary </button>
+        <div class="container multifilter">
+            <span class = "txt123"> Use Multiple Filters: </span>
+
+        <form id = 'filters' action="/overall_filter/" method="POST">
+        {% csrf_token %}
+            <select name="plt" class = 'form-control-sm'>
+                <option> Platform </option>
+                <option value="Carton - Addidas">Adidas</option>
+                <option value="Carton - GT">GT Cartons</option>
+                <option value="Flexibles -GT">GT Flexibles</option>
+            </select>
+            <!--    <input type="text" name = "age"> Age Less Than </input>-->
+            <select name="des_adv" class = 'form-control-sm'>
+                <option> Clearance (Logistics)</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+            <input type="submit" value="Find">
+        </form>
+        </div>
+
+        <div class="fixedtable">
+        <table class = "table-hover table-condensed table-bordered">
+            <thead style="text-align:center;">
+                <tr>
+                    <th> Material Description </th>
+                    <th> Customer Name </th>
+                    <th> Material Number </th>
+                    <th> Quantity </th>
+                    <th> Value </th>
+                    <th> Plant </th>
+                    <th> Division </th>
+                    <th> Clearance (Log) </th>
+                    <th> KAM's Name </th>
+                    <th> Dispatch Date (KAM) </th>
+                    <th> KAM's Remarks </th>
+                    <th> KAM's Clearance (FTM) </th>
+                </tr>
+            </thead>
+            {%for item in rows123 %}
+            <tr>
+                <td>{{ item.matdes }}</td>
+                <td>{{ item.cus_name }}</td>
+                <td>{{ item.matno }}</td>
+                <td>{{ item.qty }}</td>
+                <td>{{ item.value1 }}</td>
+                <td>{{ item.plant }}</td>
+                <td>{{ item.platform }}</td>
+                <td>{{ item.log_des_advice }}</td>
+                <td>{{item.kam_name}}</td>
+                <td>
+                    <span id="{{item.id}}_span">
+                    {{ item.kam_des_date }}
+                    </span>
+                    <button class = 'btn btn-outline-secondary' id = "{{item.id}}_btn" onclick="myFunction({{item.id}})">Update</button>
+                    <div id = "{{item.id}}" style = "display:none;">
+                    <form action="/kam_des_date/" method="POST">
+                        {% csrf_token %}
+                        <input type="text" name="kam_des_date" value = '{{item.kam_des_date}}'>
+                        <input type="hidden" name="obj_id" value= {{ item.id }}>
+                        <input type="submit" value="Update">
+                    </form>
+                    </div>
+                </td>
+                <td>
+                    <span id="{{item.id}}_kam_rem_span">
+                    {{ item.kam_remarks }}
+                    </span>
+                    <button class = 'btn btn-outline-secondary' id = "{{item.id}}_kam_rem_btn" onclick="myFunction('{{item.id}}_kam_rem')">Update</button>
+                    <div id = "{{item.id}}_kam_rem" style = "display:none;">
+                    <form style = "inline" action="/kam_comm/" method="POST">
+                        {% csrf_token %}
+                        <input type="text" name="kam_comm" value = '{{item.kam_remarks}}'>
+                        <input type="hidden" name="obj_id" value= {{ item.id }}>
+                        <input type="submit" value="Update">
+                    </form>
+                    </div>
+                </td>
+                <td>
+                    {{ item.kam_des_adv }}
+                    <form style = "inline" action="/kam_des_adv/" method="POST">
+                        {% csrf_token %}
+                        <select class = 'form-control-sm' name="adv" onchange='checkqty(this.value, {{item.id}});'>
+                            <option> Change </option>
+                            <option value="yes">Yes</option>
+                            <option value="part">Part</option>
+                            <option value="no">No</option>
+                        </select>
+                        <input type="text" name="kam_qty" id="{{item.id}}_kam_qty" style='display:none;'/>
+                        <input type="hidden" name="obj_id" value= {{ item.id }}>
+                        <span class = "part">
+                        <input type="submit" value="Update">
+                        </span>
+                    </form>
+                </td>
+            </tr>
+            {%endfor%}
+        </table>
+        </div>
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script>
+        function myFunction(id) {
+        var id_btn = id + "_btn";
+        var id_span = id + "_span";
+        var x = document.getElementById(id);
+        var y = document.getElementById(id_btn);
+        var z = document.getElementById(id_span);
+
+        if (x.style.display === "none") {
+            x.style.display = "block";
+            y.style.display = "none";
+            z.style.display = "none";
+        } else {
+            x.style.display = "none";
+            y.style.display = "block";
+            z.style.display = "block";
+        }
+        }
+
+    function checkqty(val, id){
+        id_act = id + "_kam_qty";
+        var element=document.getElementById(id_act);
+        if(val=='part')
+            element.style.display='block';
+        else
+            element.style.display='none';
+        }
+
+    </script>
+</body>
+</html>

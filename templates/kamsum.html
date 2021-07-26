@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<style>
+.fixedtable{
+    overflow-y: auto; height: 600px;
+}
+
+.fixedtable thead th{
+position: sticky; top: 0;
+}
+
+th     { background:#eee; }
+
+.part input[type=submit] {
+    padding:2px 2px;
+    background:#ccc;
+    border:0 none;
+    cursor:pointer;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+
+</style>
+<body>
+<h1> KAM Wise Summary </h1>
+<br>
+<a href = '/listview/'> Full FG View </a>
+<br>
+<a href = '/cus_sum/'> Customer Wise Summary </a>
+<br>
+<h5> Showing details for FG <= {{age}} days </h5>
+<form class = 'form-group' action = "/kam_sum/" method="POST">
+        {% csrf_token %}
+            <input type = "number" name = "dtfilter" value="90">
+            <input type="submit" name = "Change">
+</form>
+
+<table>
+    {% for key,val in overall%}
+        <tr>
+            <td> {{key}} </td>
+            <td> {{val}} </td>
+        </tr>
+    {%endfor%}
+</table>
+<br>
+
+
+<div class = "fixedtable">
+<table class = "table table-hover">
+    <thead>
+        <th>KAM</th>
+        <th>Total Value</th>
+        <th>Dispatch Advice Given(Logistics)</th>
+        <th>Dispatch Advice Given(KAM)</th>
+    </thead>
+    </thead>
+    {% for kam,det in dict %}
+       <tr>
+           <td><a href="/kam_det?kam={{kam}}"> {{ kam }} </a></td>
+           <td>{{ det.total_value }}</td>
+           <td>{{ det.value_log_yes }}</td>
+           <td>{{ det.value_kam_yes }}</td>
+        </tr>
+    {% endfor %}
+</table>
+</div>
+
+</body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</html>

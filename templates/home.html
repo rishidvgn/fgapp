@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<style>
+.fixedtable{
+    overflow-y: auto; height: 680px;
+}
+
+.fixedtable thead th{
+position: sticky; top: 0;
+}
+
+th     { background:#eee; }
+
+.part input[type=submit] {
+    padding:2px 2px;
+    background:#ccc;
+    border:0 none;
+    cursor:pointer;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+
+</style>
+<body>
+<div class = "container">
+<h1>
+    Welcome {{ user}}
+</h1>
+
+<form action="/upload/" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="todayfg">
+        <input type="submit" value="Upload">
+</form>
+<a href = "/logout/"> Logout </a>
+<br>
+<a href = /listview/> FG View</a>
+<br>
+<a href = /kam_sum/> KAM Wise Summary </a>
+<br>
+<a href = /cus_sum/> Customer Wise Summary </a>
+</div>
+</body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</html>
